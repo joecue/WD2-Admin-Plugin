@@ -75,3 +75,9 @@ run_wp2_toolbox();
 
 require_once( plugin_dir_path( __FILE__ ).'php/login-logo.php' );
 require_once( plugin_dir_path( __FILE__ ).'php/admin-widget.php' );
+require_once( plugin_dir_path( __FILE__ ).'php/admin-labels.php' );
+
+function enqueue_dashboard_css() {
+ wp_enqueue_style( 'dashboard-styling',  plugin_dir_url( __FILE__ ) . '/css/dashboard.css' );
+}
+add_action( 'admin_head', 'enqueue_dashboard_css' );

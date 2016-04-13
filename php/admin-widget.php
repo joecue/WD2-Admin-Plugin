@@ -44,4 +44,55 @@ echo '<h1>Welcome to Web Design 2!</h1>
 <img src="' . plugins_url( 'images/LCCClogo2C.png', dirname(__FILE__) ) . '" style="margin: 0 0 0 100px;" alt="LCCC Logo">';
 }
 
+function wd2_rss_dashboard_widget_function() {
+     $rss = fetch_feed( "https://unsplash.com/rss" );
+  
+     if ( is_wp_error($rss) ) {
+          if ( is_admin() || current_user_can('manage_options') ) {
+               echo '<p>';
+               printf(__('<strong>RSS Error</strong>: %s'), $rss->get_error_message());
+               echo '</p>';
+          }
+     return;
+}
+  
+if ( !$rss->get_item_quantity() ) {
+     echo '<p>Apparently, there are no updates to show!</p>';
+     $rss->__destruct();
+     unset($rss);
+     return;
+}
+  
+echo "<ul>\n";
+  
+if ( !isset($items) )
+     $items = 5;
+  
+     foreach ( $rss->get_items(0, $items) as $item ) {
+          $publisher = '';
+          $site_link = '';
+          $link = '';
+          $content = '';
+          $date = '';
+          $link = esc_url( strip_tags( $item->get_link() ) );
+          $title = esc_html( $item->get_title() );
+          $content = $item->get_content();
+          $content = wp_html_excerpt($content, 250) . ' ...';
+          //$image = $item->get_medium();
+          $enclosure = $item->get_enclosure();
+          echo "<img src='" . $enclosure->get_thumbnail() . "'/><br />";
+         //echo "<li><a class='rsswidget' href='$link'>$title</a>\n<div class='rssSummary'>$image</div>\n";
+}
+  
+echo "</ul>\n";
+$rss->__destruct();
+unset($rss);
+}
+ 
+function wd2_add_rss_dashboard_widget() {
+     wp_add_dashboard_widget('unsplash_dashboard_widget', 'Recent Posts from unsplash.com', 'wd2_rss_dashboard_widget_function');
+}
+ 
+add_action('wp_dashboard_setup', 'wd2_add_rss_dashboard_widget');
+
 ?>
